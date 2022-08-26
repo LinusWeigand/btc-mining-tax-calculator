@@ -32,6 +32,7 @@ const AddressForm = (props: { handler: (address: string) => void }) => {
                     name='address'
                     value={values.address}
                     onChange={handleAddressInputChange}
+                    autoFocus
                 />
             </form>
         </div>
