@@ -1,9 +1,10 @@
 import './Bitcoin.css';
 import { AgGridReact } from 'ag-grid-react';
 import { useEffect, useMemo, useState } from 'react';
-import AddressForm from './../../components/AddressForm/AddressForm.tsx';
+import AddressForm from '../../components/AddressForm/AddressForm.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import Autocomplete from '@mui/material/Autocomplete';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 //1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
@@ -14,14 +15,14 @@ const Bitcoin = () => {
   const [validAddress, setValidAddress] = useState(false);
 
   const columnDefs = [
-    { headerName: 'Date', field: "block_time" },
-    { headerName: 'Time', field: "block_time" },
-    { headerName: 'Value', field: "balance_diff" },
+    { headerName: 'Date', field: "date" },
+    { headerName: 'Time', field: "time" },
+    { headerName: 'Value', field: "value" },
     {
       headerName: 'Value In Euro', field: "valueInEuro",
       valueFormatter: (p) => `${Math.round(p.value * 100) / 100} €`
     },
-    { headerName: 'IN/OUT', field: "inOrOut" },
+    { headerName: 'IN/OUT', field: "direction" },
     { headerName: 'Txn Hash', field: "block_hash" },
     { headerName: 'Txn Fee', field: "fee", valueFormatter: (p) => p.value + " BTC" },
     {
@@ -44,12 +45,35 @@ const Bitcoin = () => {
       alert("not a valid address");
     } else {
       setValidAddress(true);
-      setRowData(result_json.data.list);
+      prepareData(result_json.data.list);
     }
   }
 
-  const prepareData = async () => {
+  const prepareData = async (data) => {
+    let result = [];
 
+    for (let i = 0; i < data.length; i++) {
+      let row = data[i];
+      const timestamp = row.block_time;
+      const btcPrice = await getBtcPrice(timestamp);
+      console.log("timestamp: ", timestamp);
+
+      if (btcPrice.Data.Data) {
+        const price = btcPrice.Data.Data[1].close;
+        console.log("price: ", price);
+        row.date = new Date(Number(timestamp * 1000)).toISOString().split('T')[0];
+        row.time = new Date(Number(timestamp * 1000)).toISOString().split('T')[1].split('.')[0];
+        row.timestamp = timestamp;
+        row.value = satsToBtc(row.balance_diff);
+        row.direction = row.value > 0 ? 'IN' : 'OUT';
+        row.valueInEuro = row.value * price;
+        row.fee = satsToBtc(row.fee);
+        row.feeInEuro = price * row.fee;
+
+        result.push(row);
+      }
+    }
+    setRowData(result);
   }
 
   const getBtcPrice = async (timeStamp) => {
@@ -57,7 +81,12 @@ const Bitcoin = () => {
     return await response.json();
   };
 
+  const satsToBtc = (sats) => {
+    return sats / Math.pow(10, 8);
+  };
+
   const updateAddress = (adr) => {
+    console.log("new Address: ", adr);
     setAddress((cur) => adr);
   }
 
@@ -70,6 +99,10 @@ const Bitcoin = () => {
   return (
     <div className='ag-theme-alpine-dark' style={{ height: 600, width: 1400 }}>
       <AddressForm handler={updateAddress} />
+      {/* <Autocomplete
+        disablePortal
+        id=''
+      /> */}
       {validAddress && <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs} 

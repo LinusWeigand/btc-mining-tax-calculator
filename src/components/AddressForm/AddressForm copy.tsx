@@ -5,7 +5,7 @@ import './AddressForm.css';
 const AddressForm = (props: { handler: (address: string) => void }) => {
 
     const [values, setValues] = useState({
-        address: '',
+        address: '1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv',
     });
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
