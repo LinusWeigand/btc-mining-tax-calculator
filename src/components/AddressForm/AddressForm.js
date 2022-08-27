@@ -1,28 +1,33 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import './AddressForm.css';
 
 const filter = createFilterOptions();
 
 const AddressForm = ( { handler } ) => {
     const [value, setValue] = React.useState(null);
     const [address, setAddress] = React.useState(null);
-    const [counter, setCounter] = React.useState(0);
-    
-    React.useEffect(() => {
-        console.log("handleSubmit");
-        setAddress((cur) => value);
-    }, [counter]);
-    
+    const [addresses, setAddresses] = React.useState(
+        JSON.parse(localStorage.getItem('addresses')) || []
+    );
 
     React.useEffect(() => {
+        
         if (address !== null) {
             handler(address.title);
+            
+            if (addresses.filter(adr => adr.title === address.title).length === 0) {
+                setAddresses(cur => [...cur, address]);
+                localStorage.setItem('addresses', JSON.stringify(addresses.concat([{title: address.title}])));
+            }
         }
     }, [address]);
 
-  return (
-    <Autocomplete
+    return (
+        <div>
+      <Autocomplete
+          className='formField'
       value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === 'string') {
@@ -56,16 +61,16 @@ const AddressForm = ( { handler } ) => {
           selectOnFocus
           autoHighlight
           autoSelect
-        clearOnBlur
+          clearOnBlur
           handleHomeEndKeys
           onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                  setCounter((cur) => cur + 1);
+                setAddress((cur) => value);
               }
           }}
           
       id="autocomplete"
-      options={addresses}
+      options={addresses.map((option) => option)}
       getOptionLabel={(option) => {
         // Value selected with enter, right from the input
         if (typeof option === 'string') {
@@ -84,12 +89,11 @@ const AddressForm = ( { handler } ) => {
       renderInput={(params) => (
         <TextField {...params} label="Public Address" />
       )}
-    />
+            />
+            </div>
   );
 }
 
 export default AddressForm;
 
-const addresses = [
-    { title: '1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv' },
-];
+

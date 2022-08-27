@@ -3,12 +3,13 @@
 }
 
 .formField {
-    margin: 10px 0 10px 0;
+    margin: 10px 0 10px 10px;
     min-width: 500px;
     padding: 15px;
     font-size: 16px;
     border: 0;
     font-size: "Roboto", sans-serif;
+    color: white;
 }
 
 .formButton {

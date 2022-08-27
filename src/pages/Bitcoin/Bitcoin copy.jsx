@@ -9,7 +9,7 @@ import { IconButton } from '@mui/material';
 import { useStateContext } from '../../contexts/ContextProvider';
 import { useForceUpdate } from '../../components/CustomHooks/useForceUpdate';
 import { useRef, useCallback } from 'react';
-import AddressForm from '../../components/AddressForm/AddressForm.tsx';
+import AddressForm from '../../components/AddressForm/AddressForm.js';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 const Bitcoin = () => {
