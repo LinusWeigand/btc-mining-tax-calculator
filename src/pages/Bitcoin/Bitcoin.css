@@ -1,11 +1,13 @@
 .bitcoin {
     flex: 1;
     overflow: scroll;
-    background-color: #1c1c1c;
-    padding-left: 200px;
+    /* background-color: #1c1c1c; */
+    background-color: green;
+    padding-left: 20px;
     padding-right: 200px;
-    padding-top: 70px;
+    padding-top: 20px;
     color: white;
+
 }
 
 .headline{ 
@@ -38,10 +40,5 @@
     font-size: medium;
     background: transparent;
     color: white;
-}
-
-.addressform {
-    margin-left: 10px;
-    background-color: red;
 }
 

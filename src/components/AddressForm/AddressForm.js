@@ -6,7 +6,9 @@ import './AddressForm.css';
 const filter = createFilterOptions();
 
 const AddressForm = ( { handler } ) => {
-    const [value, setValue] = React.useState(null);
+  const [value, setValue] = React.useState(
+      JSON.parse(localStorage.getItem('value')) || null
+    );
     const [address, setAddress] = React.useState(null);
     const [addresses, setAddresses] = React.useState(
         JSON.parse(localStorage.getItem('addresses')) || []
@@ -15,7 +17,8 @@ const AddressForm = ( { handler } ) => {
     React.useEffect(() => {
         
         if (address !== null) {
-            handler(address.title);
+          handler(address.title);
+          localStorage.setItem('value', JSON.stringify(value));
             
             if (addresses.filter(adr => adr.title === address.title).length === 0) {
                 setAddresses(cur => [...cur, address]);

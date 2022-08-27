@@ -8,6 +8,7 @@ import {
   Routes,
   Route
 } from "react-router-dom";
+import Inventory from '../../components/Inventory/Inventory';
 function App() {
   return (
     <Router>
@@ -18,7 +19,8 @@ function App() {
           <Sidebar />
           <Routes>
             <Route path="/" element={<Bitcoin />}/>
-            <Route path="/bitcoin" element={<Bitcoin />}/>
+            <Route path="/home" element={<Bitcoin />} />
+            <Route path="/tax" element={<Inventory />} />
           </Routes>
         </div>
       </div>

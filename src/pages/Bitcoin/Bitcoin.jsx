@@ -4,14 +4,16 @@ import { useEffect, useState } from 'react';
 import AddressForm from '../../components/AddressForm/AddressForm.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import Inventory from '../../components/Inventory/Inventory';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 //1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
 
 const Bitcoin = () => {
-  const [rowData, setRowData] = useState();
+  const [rowData, setRowData] = useState(
+    JSON.parse(localStorage.getItem('rowData')) || null
+  );
   const [address, setAddress] = useState('');
-  const [validAddress, setValidAddress] = useState(false);
   const [inventory, setInventory] = useState([]);
   const [soldInventory, setSoldInventory] = useState([]);
 
@@ -45,10 +47,10 @@ const Bitcoin = () => {
     const result = await fetch(`https://chain.api.btc.com/v3/address/${address}/tx`);
     const result_json = await result.json();
     if (result_json.data === null) {
-      setValidAddress(false);
+      setRowData(null);
+      localStorage.setItem('rowData', JSON.stringify(null));
       alert("not a valid address");
     } else {
-      setValidAddress(true);
       prepareData(result_json.data.list);
     }
   }
@@ -63,6 +65,7 @@ const Bitcoin = () => {
 
       if (btcPrice.Data.Data) {
         const price = btcPrice.Data.Data[1].close;
+        row.price = price;
         row.date = new Date(Number(timestamp * 1000)).toISOString().split('T')[0];
         row.time = new Date(Number(timestamp * 1000)).toISOString().split('T')[1].split('.')[0];
         row.timestamp = timestamp;
@@ -81,6 +84,7 @@ const Bitcoin = () => {
         }
       }
     }
+    localStorage.setItem('rowData', JSON.stringify(result));
     setRowData(result);
   }
 
@@ -99,18 +103,27 @@ const Bitcoin = () => {
     }
   }, [address]);
 
+  useEffect(() => {
+    console.log('localStorage: ', localStorage);
+    console.log('(mount) rowData: ', rowData);
+  }, []);
+
+  useEffect(() => {
+    console.log('(update) rowData: ', rowData);
+  }, [rowData]);
+
   return (
-    <div className='ag-theme-alpine-dark' style={{ height: 600, width: 1400 }}>
+    <div className='ag-theme-alpine-dark' style={{ height: 600, width: 1400}}>
       <AddressForm handler={setAddress} className='addressform'/>
-      {validAddress && <AgGridReact
+      {rowData !== null &&
+        <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs} 
         defaultColDef={defaultColDef}
         />
       }
-      <br />
       
-    </div>
+      </div>
   );
 }
 

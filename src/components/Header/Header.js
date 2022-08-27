@@ -1,14 +1,14 @@
 import React from 'react'
 import "./Header.css";
 import { IconButton } from '@mui/material';
-import logo from "../../data/logo.png";
+import BitcoinIcon from "../../data/BitcoinIcon";
 
 function Header() {
   return (
     <div className="header">
         <div className="header__left">
                 <IconButton>
-                    <img src={logo} alt="" className="header__logo"></img>
+                  <BitcoinIcon />
                 </IconButton>
         </div>
     </div>
