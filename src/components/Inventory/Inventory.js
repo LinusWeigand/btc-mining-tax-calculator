@@ -3,12 +3,11 @@ import './Inventory.css';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 
 const Inventory = () => {
-    const [inventory, setInventory] = useState(
-        JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') || null
-    );
-    const [soldInventory, setSoldInventory] = useState(
-        JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') || null
-    )
+    const inventory = JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') || null;
+    const soldInventory = JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') || null;
+    
+    const [fifo, setFifo] = useState(null);
+    const [lifo, setLifo] = useState(null);
     const columnDefs = [
         {
             headerName: 'Value', field: 'value',
@@ -20,13 +19,26 @@ const Inventory = () => {
         }
     ];
 
-    const columnDefsSold = [
-        ...columnDefs,
+    const columnDefsAccounting = [
         {
-            headerName: 'Bought at', field: 'bought-at'
+            headerName: 'Buy Value', field: 'buy_value',
+            valueFormatter: (p) => `${p.value} BTC`
         },
         {
-            headerName: 'Profit / Loss', field: 'pl'
+            headerName: 'Buy Price', field: 'buy_price',
+            valueFormatter: (p) => `${p.value} €`
+        },
+        {
+            headerName: 'Sell Value', field: 'sell_value',
+            valueFormatter: (p) => `${p.value} BTC`
+        },
+        {
+            headerName: 'Sell Price', field: 'sell_price',
+            valueFormatter: (p) => `${p.value} €`
+        },
+        {
+            headerName: 'Profit / Loss', field: 'profit_loss',
+            valueFormatter: (p) => `${p.value} €`
         }
     ]
 
@@ -36,54 +48,152 @@ const Inventory = () => {
         editable: true
     };
 
-    const prepareData = () => {
-        for (let i = 0; i < soldInventory.length; i++) {
-            const row = soldInventory[i];
-
-            const value = row.value;
-            let tempInventory = inventory;
-            const firstBought = tempInventory.shift();
-            const firstBoughtValue = firstBought.value;
-            const firstBoughtPrice = firstBought.price;
-            
-            if (firstBoughtValue >= value) {
-                //einfacher case
-                
+    const calculateFifo = (inventory, soldInventory) => {
+        let result = [];
+        let i = 0;
+        let j = 0;
+        while (i < inventory.length && j < soldInventory.length) {
+            let buy = inventory[i];
+            let sell = soldInventory[j];
+            let buy_value = buy.value;
+            let buy_price = buy.price;
+            let sell_value = Math.abs(sell.value);
+            let sell_price = sell.price;
+            let buy_value_left = buy_value - sell_value;
+            console.log(`buy_value: ${buy_value}, sell_value: ${sell_value}, buy_value_left: ${buy_value_left}`);
+            if (buy_value_left > 0) {
+                //simple case
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: sell_value,
+                    buy_price: buy_price,
+                    sell_value: sell_value,
+                    sell_price: sell_price,
+                    profit_loss: sell_value * buy_price - sell_value * sell_price
+                });
+                buy.value -= sell.value;
+                j++;
+            } else if (buy_value_left < 0) {
+                //complex case
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: buy_value,
+                    buy_price: buy_price,
+                    sell_value: buy_value,
+                    sell_price: sell_price,
+                    profit_loss: buy_value * buy_price - buy_value * sell_price
+                });
+                sell.value -= buy.value;
+                i++;
+            } else {
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: buy_value,
+                    buy_price: buy_price,
+                    sell_value: sell_value,
+                    sell_price: sell_price,
+                    profit_loss: buy_value * buy_price - sell_value * sell_price
+                });
+                i++;
+                j++;
             }
-
         }
+        return result;
     }
 
-    useEffect(() => {
-        console.log('(mount) inventory: ', inventory);
-        console.log('(mount) soldInventory: ', soldInventory);
-        
-    }, []);
+    const calculateLifo = (inventory, soldInventory) => {
+        let result = [];
+        let i = inventory.length - 1;
+        let j = 0;
+        while (i >= 0 && j < soldInventory.length) {
+            let buy = inventory[i];
+            let sell = soldInventory[j];
+            let buy_value = buy.value;
+            let buy_price = buy.price;
+            let sell_value = Math.abs(sell.value);
+            let sell_price = sell.price;
+            let buy_value_left = buy_value - sell_value;
+            console.log(`buy_value: ${buy_value}, sell_value: ${sell_value}, buy_value_left: ${buy_value_left}`);
+            if (buy_value_left > 0) {
+                //simple case
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: sell_value,
+                    buy_price: buy_price,
+                    sell_value: sell_value,
+                    sell_price: sell_price,
+                    profit_loss: sell_value * buy_price - sell_value * sell_price
+                });
+                buy.value -= sell.value;
+                j++;
+            } else if (buy_value_left < 0) {
+                //complex case
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: buy_value,
+                    buy_price: buy_price,
+                    sell_value: buy_value,
+                    sell_price: sell_price,
+                    profit_loss: buy_value * buy_price - buy_value * sell_price
+                });
+                sell.value -= buy.value;
+                i--;
+            } else {
+                sell_value = Math.abs(sell_value);
+                result.push({
+                    buy_value: buy_value,
+                    buy_price: buy_price,
+                    sell_value: sell_value,
+                    sell_price: sell_price,
+                    profit_loss: buy_value * buy_price - sell_value * sell_price
+                });
+                i--;
+                j++;
+            }
+        }
+        return result;
+    }
     
-    useEffect(() => {
-        console.log('(update) inventory: ', inventory);
-        console.log('(update) soldInventory: ', soldInventory);
-    }, [inventory, soldInventory]);
 
   return (
-      <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '1400px', display: 'flex'}}>
-          LOL
-          <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px'}}>
-          <AgGridReact
-              
-              rowData={inventory}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              />
-          </div >
-          <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '800px'}}>
-          <AgGridReact
-              rowData={soldInventory}
-              columnDefs={columnDefsSold}
-              defaultColDef={defaultColDef}
+    <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '800px', marginTop: '20px'}}>
+        <div style={{ display: 'flex'}}>
+            <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px' }}>
+            <h1>Bought</h1>
+            <AgGridReact
+                rowData={inventory}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+            />
+            </div >
+            <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px', marginLeft: '20px' }}>
+            <h1>Sold</h1>
+            <AgGridReact
+                rowData={soldInventory}
+                columnDefs={columnDefs}
+                defaultColDef={defaultColDef}
+            />
+          </div>
+          </div>
+          <div style={{width: '1000px', height: `calc(50px + (${fifo?.length} * 42px))`, marginTop: '60px'}}>
+              <h1>FIFO</h1>
+              <button onClick={() => setFifo(() => calculateFifo(inventory, soldInventory))}>calc</button>
+              <AgGridReact
+                  rowData={fifo}
+                  columnDefs={columnDefsAccounting}
+                  defaultColDef={defaultColDef}
               />
           </div>
-          LOL2
+
+          <div style={{width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px'}}>
+              <h1>LIFO</h1>
+              <button onClick={() => setLifo(() => calculateLifo(inventory, soldInventory))}>calc</button>
+              <AgGridReact
+                  rowData={lifo}
+                  columnDefs={columnDefsAccounting}
+                  defaultColDef={defaultColDef}
+              />
+          </div>
     </div>
   )
 }
