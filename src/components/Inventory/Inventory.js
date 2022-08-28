@@ -69,7 +69,7 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: sell_value,
                     sell_price: sell_price,
-                    profit_loss: sell_value * buy_price - sell_value * sell_price
+                    profit_loss: sell_value * sell_price - sell_value * buy_price
                 });
                 buy.value -= sell.value;
                 j++;
@@ -81,7 +81,7 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: buy_value,
                     sell_price: sell_price,
-                    profit_loss: buy_value * buy_price - buy_value * sell_price
+                    profit_loss: buy_value * sell_price - buy_value * buy_price
                 });
                 sell.value -= buy.value;
                 i++;
@@ -92,7 +92,7 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: sell_value,
                     sell_price: sell_price,
-                    profit_loss: buy_value * buy_price - sell_value * sell_price
+                    profit_loss: buy_value * sell_price - sell_value * buy_price
                 });
                 i++;
                 j++;
@@ -122,7 +122,7 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: sell_value,
                     sell_price: sell_price,
-                    profit_loss: sell_value * buy_price - sell_value * sell_price
+                    profit_loss: sell_value * sell_price - sell_value * buy_price
                 });
                 buy.value -= sell.value;
                 j++;
@@ -134,9 +134,9 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: buy_value,
                     sell_price: sell_price,
-                    profit_loss: buy_value * buy_price - buy_value * sell_price
+                    profit_loss: buy_value * sell_price - buy_value * buy_price
                 });
-                sell.value -= buy.value;
+                sell.value = sell_value - buy.value;
                 i--;
             } else {
                 sell_value = Math.abs(sell_value);
@@ -145,7 +145,7 @@ const Inventory = () => {
                     buy_price: buy_price,
                     sell_value: sell_value,
                     sell_price: sell_price,
-                    profit_loss: buy_value * buy_price - sell_value * sell_price
+                    profit_loss: buy_value * sell_price - sell_value * buy_price
                 });
                 i--;
                 j++;
@@ -153,7 +153,7 @@ const Inventory = () => {
         }
         return result;
     }
-    
+
 
   return (
     <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '800px', marginTop: '20px'}}>
