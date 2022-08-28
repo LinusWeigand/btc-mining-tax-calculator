@@ -6,8 +6,12 @@ const Inventory = () => {
     const inventory = JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') || null;
     const soldInventory = JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') || null;
     
-    const [fifo, setFifo] = useState(null);
-    const [lifo, setLifo] = useState(null);
+    const [fifo, setFifo] = useState(
+        JSON.parse(localStorage.getItem('fifo')) || null
+    );
+    const [lifo, setLifo] = useState(
+        JSON.parse(localStorage.getItem('lifo')) || null
+    );
     const columnDefs = [
         {
             headerName: 'Value', field: 'value',
@@ -154,6 +158,17 @@ const Inventory = () => {
         return result;
     }
 
+    useEffect(() => {
+        setLifo(() => calculateLifo(
+            JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') ?? [],
+            JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') ?? []
+        ));
+        setFifo(() => calculateFifo(
+            JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') ?? [],
+            JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') ?? []
+        ));
+    }, []);
+
 
   return (
     <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '800px', marginTop: '20px'}}>
@@ -177,7 +192,6 @@ const Inventory = () => {
           </div>
           <div style={{width: '1000px', height: `calc(50px + (${fifo?.length} * 42px))`, marginTop: '60px'}}>
               <h1>FIFO</h1>
-              <button onClick={() => setFifo(() => calculateFifo(inventory, soldInventory))}>calc</button>
               <AgGridReact
                   rowData={fifo}
                   columnDefs={columnDefsAccounting}
@@ -185,9 +199,8 @@ const Inventory = () => {
               />
           </div>
 
-          <div style={{width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px'}}>
+          <div style={{width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px', marginBottom: '100px'}}>
               <h1>LIFO</h1>
-              <button onClick={() => setLifo(() => calculateLifo(inventory, soldInventory))}>calc</button>
               <AgGridReact
                   rowData={lifo}
                   columnDefs={columnDefsAccounting}
