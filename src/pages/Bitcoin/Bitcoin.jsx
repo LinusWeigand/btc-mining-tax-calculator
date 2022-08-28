@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import AddressForm from '../../components/AddressForm/AddressForm.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import Inventory from '../../components/Inventory/Inventory';
-import { green } from '@mui/material/colors';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 //1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
@@ -15,8 +13,12 @@ const Bitcoin = () => {
     JSON.parse(localStorage.getItem('rowData')) || null
   );
   const [address, setAddress] = useState('');
-  const [inventory, setInventory] = useState([]);
-  const [soldInventory, setSoldInventory] = useState([]);
+  const [balance, setBalance] = useState(
+    JSON.parse(localStorage.getItem('balance')) || null
+  );
+  const [btcPrice, setBtcPrice] = useState(
+    JSON.parse(localStorage.getItem('btcPrice')) || null
+  );
 
   const columnDefs = [
     { headerName: 'Date', field: "date" },
@@ -30,12 +32,12 @@ const Bitcoin = () => {
       valueFormatter: (p) => `${Math.round(p.value * 100) / 100} €`
     },
     { headerName: 'IN/OUT', field: "direction" },
-    { headerName: 'Txn Hash', field: "block_hash" },
     { headerName: 'Txn Fee', field: "fee", valueFormatter: (p) => p.value + " BTC" },
     {
       headerName: 'Fee in Euro', field: "feeInEuro",
       valueFormatter: (p) => `${Math.round(p.value * 100) / 100} €`
     },
+    { headerName: 'Txn Hash', field: "block_hash" },
   ];
 
   const defaultColDef = {
@@ -77,12 +79,6 @@ const Bitcoin = () => {
         row.feeInEuro = price * row.fee;
 
         result.push(row);
-
-        if (row.direction === 'IN') {
-          setInventory((values) => [...values, { value: row.value, price: price }]);
-        } else {
-          setSoldInventory((values) => [...values, { value: row.value, price: price }]);
-        }
       }
     }
     localStorage.setItem('rowData', JSON.stringify(result));
@@ -94,28 +90,57 @@ const Bitcoin = () => {
     return await response.json();
   };
 
+  const getCurrentBtcPrice = async () => {
+    const response = await fetch(`https://min-api.cryptocompare.com/data/v2/histohour?fsym=BTC&tsym=EUR&limit=1&toTs=${Date.now()}`);
+    const respone_json = await response.json();
+    const price = respone_json.Data.Data[1].close;
+    setBtcPrice(price);
+    localStorage.setItem('btcPrice', JSON.stringify(price));
+  }
+
   const satsToBtc = (sats) => {
     return sats / Math.pow(10, 8);
   };
 
+  const getBalance = async (address) => {
+    const result = await fetch(`https://blockchain.info/q/addressbalance/${address}`);
+    const result_json = await result.json();
+    if (result_json === null) {
+      setBalance(null);
+      localStorage.setItem('balance', JSON.stringify(null));
+    } else {
+      setBalance(satsToBtc(result_json));
+      localStorage.setItem('balance', JSON.stringify(satsToBtc(result_json)));
+    }
+  }
+
   useEffect(() => {
     if (address !== "") {
       fetchData(address)
+      getBalance(address)
     }
   }, [address]);
 
   useEffect(() => {
-    console.log('localStorage: ', localStorage);
-    console.log('(mount) rowData: ', rowData);
+    getCurrentBtcPrice();
   }, []);
 
-  useEffect(() => {
-    console.log('(update) rowData: ', rowData);
-  }, [rowData]);
 
   return (
     <div className='ag-theme-alpine-dark' style={{ height: `calc(50px + (${rowData?.length} * 42px))`, width: 'calc(100% - 250px)' }}>
-      <AddressForm handler={setAddress} className='addressform'/>
+      <div style={{display: 'flex'}} >
+        <AddressForm handler={setAddress} className='addressform' />
+        {balance !== null &&
+          <div style={{display: 'flex'}}>
+          <h1 style={{ padding: '30px 0px 30px 30px' }}>
+          Balance:
+          </h1>
+          <h2 style={{padding: '35px 0px 30px 10px'}}>
+            {balance} BTC / {Math.round(balance * btcPrice * 100) / 100} €
+            </h2>
+        </div>
+        }
+      </div>
       {rowData !== null &&
         <AgGridReact
         rowData={rowData}

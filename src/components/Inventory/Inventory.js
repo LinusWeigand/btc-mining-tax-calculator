@@ -64,7 +64,6 @@ const Inventory = () => {
             let sell_value = Math.abs(sell.value);
             let sell_price = sell.price;
             let buy_value_left = buy_value - sell_value;
-            console.log(`buy_value: ${buy_value}, sell_value: ${sell_value}, buy_value_left: ${buy_value_left}`);
             if (buy_value_left > 0) {
                 //simple case
                 sell_value = Math.abs(sell_value);
@@ -117,7 +116,6 @@ const Inventory = () => {
             let sell_value = Math.abs(sell.value);
             let sell_price = sell.price;
             let buy_value_left = buy_value - sell_value;
-            console.log(`buy_value: ${buy_value}, sell_value: ${sell_value}, buy_value_left: ${buy_value_left}`);
             if (buy_value_left > 0) {
                 //simple case
                 sell_value = Math.abs(sell_value);
@@ -171,43 +169,45 @@ const Inventory = () => {
 
 
   return (
-    <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '800px', marginTop: '20px'}}>
-        <div style={{ display: 'flex'}}>
-            <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px' }}>
-            <h1>Bought</h1>
-            <AgGridReact
-                rowData={inventory}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-            />
-            </div >
-            <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px', marginLeft: '20px' }}>
-            <h1>Sold</h1>
-            <AgGridReact
-                rowData={soldInventory}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-            />
-          </div>
-          </div>
-          <div style={{width: '1000px', height: `calc(50px + (${fifo?.length} * 42px))`, marginTop: '60px'}}>
-              <h1>FIFO</h1>
-              <AgGridReact
-                  rowData={fifo}
-                  columnDefs={columnDefsAccounting}
-                  defaultColDef={defaultColDef}
-              />
-          </div>
+      <div className='ag-theme-alpine-dark' style={{ width: '1400px', height: '800px', marginTop: '20px' }}>
+          {inventory !== null ? <div>
+              <div style={{ display: 'flex' }}>
+                  <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px' }}>
+                      <h1>Bought</h1>
+                      <AgGridReact
+                          rowData={inventory}
+                          columnDefs={columnDefs}
+                          defaultColDef={defaultColDef}
+                      />
+                  </div >
+                  <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px', marginLeft: '20px' }}>
+                      <h1>Sold</h1>
+                      <AgGridReact
+                          rowData={soldInventory}
+                          columnDefs={columnDefs}
+                          defaultColDef={defaultColDef}
+                      />
+                  </div>
+              </div>
+              <div style={{ width: '1000px', height: `calc(50px + (${fifo?.length} * 42px))`, marginTop: '60px' }}>
+                  <h1>FIFO</h1>
+                  <AgGridReact
+                      rowData={fifo}
+                      columnDefs={columnDefsAccounting}
+                      defaultColDef={defaultColDef}
+                  />
+              </div>
 
-          <div style={{width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px', marginBottom: '100px'}}>
-              <h1>LIFO</h1>
-              <AgGridReact
-                  rowData={lifo}
-                  columnDefs={columnDefsAccounting}
-                  defaultColDef={defaultColDef}
-              />
-          </div>
-    </div>
+              <div style={{ width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px', marginBottom: '100px' }}>
+                  <h1>LIFO</h1>
+                  <AgGridReact
+                      rowData={lifo}
+                      columnDefs={columnDefsAccounting}
+                      defaultColDef={defaultColDef}
+                  />
+              </div>
+          </div> : <h1>Navigate to Home and enter a public address</h1>}
+    </div >
   )
 }
 
