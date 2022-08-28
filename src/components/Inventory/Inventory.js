@@ -4,10 +4,10 @@ import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 
 const Inventory = () => {
     const [inventory, setInventory] = useState(
-        JSON.parse(localStorage.getItem('rowData')).filter(row => row.direction === 'IN') || null
+        JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'IN') || null
     );
     const [soldInventory, setSoldInventory] = useState(
-        JSON.parse(localStorage.getItem('rowData')).filter(row => row.direction === 'OUT') || null
+        JSON.parse(localStorage.getItem('rowData'))?.filter(row => row.direction === 'OUT') || null
     )
     const columnDefs = [
         {
@@ -66,18 +66,23 @@ const Inventory = () => {
     }, [inventory, soldInventory]);
 
   return (
-      <div className='ag-theme-alpine-dark inventory'>
+      <div className='ag-theme-alpine-dark' style={{width: '1400px', height: '1400px', display: 'flex'}}>
           LOL
+          <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px'}}>
           <AgGridReact
+              
               rowData={inventory}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
-          />
+              />
+          </div >
+          <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '800px'}}>
           <AgGridReact
               rowData={soldInventory}
               columnDefs={columnDefsSold}
               defaultColDef={defaultColDef}
-          />
+              />
+          </div>
           LOL2
     </div>
   )

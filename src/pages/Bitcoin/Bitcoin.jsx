@@ -5,6 +5,7 @@ import AddressForm from '../../components/AddressForm/AddressForm.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import Inventory from '../../components/Inventory/Inventory';
+import { green } from '@mui/material/colors';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 //1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
@@ -113,7 +114,7 @@ const Bitcoin = () => {
   }, [rowData]);
 
   return (
-    <div className='ag-theme-alpine-dark' style={{ height: 600, width: 1400}}>
+    <div className='ag-theme-alpine-dark' style={{ height: `calc(50px + (${rowData?.length} * 42px))`, width: 'calc(100% - 250px)' }}>
       <AddressForm handler={setAddress} className='addressform'/>
       {rowData !== null &&
         <AgGridReact
