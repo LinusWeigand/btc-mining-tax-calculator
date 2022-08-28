@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Inventory.css';
 import { AgGridReact } from 'ag-grid-react/lib/agGridReact';
 
@@ -22,6 +22,10 @@ const Inventory = () => {
             valueFormatter: (p) => `${p.value} €`
         }
     ];
+    const boughtGridRef = useRef();
+    const soldGridRef = useRef();
+    const fifoGridRef = useRef();
+    const lifoGridRef = useRef();
 
     const columnDefsAccounting = [
         {
@@ -173,16 +177,24 @@ const Inventory = () => {
           {inventory !== null ? <div>
               <div style={{ display: 'flex' }}>
                   <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px' }}>
-                      <h1>Bought</h1>
+                      <div style={{display: 'flex'}}>
+                          <h1>Bought</h1>
+                          <button style={{ marginLeft: '260px' }} onClick={() => {boughtGridRef.current.api.exportDataAsCsv();}}>Export</button>
+                      </div>
                       <AgGridReact
+                          ref={boughtGridRef}
                           rowData={inventory}
                           columnDefs={columnDefs}
                           defaultColDef={defaultColDef}
                       />
                   </div >
                   <div style={{ height: `calc(50px + (${inventory?.length} * 42px))`, width: '400px', marginLeft: '20px' }}>
-                      <h1>Sold</h1>
+                      <div style={{display: 'flex'}}>
+                          <h1>Sold</h1>
+                          <button style={{ marginLeft: '297px' }} onClick={() => {soldGridRef.current.api.exportDataAsCsv();}}>Export</button>
+                      </div>
                       <AgGridReact
+                          ref={soldGridRef}
                           rowData={soldInventory}
                           columnDefs={columnDefs}
                           defaultColDef={defaultColDef}
@@ -190,17 +202,25 @@ const Inventory = () => {
                   </div>
               </div>
               <div style={{ width: '1000px', height: `calc(50px + (${fifo?.length} * 42px))`, marginTop: '60px' }}>
-                  <h1>FIFO</h1>
+                      <div style={{display: 'flex'}}>
+                        <h1>FIFO</h1>
+                        <button style={{ marginLeft: '896px' }} onClick={() => { fifoGridRef.current.api.exportDataAsCsv(); }}>Export</button>
+                      </div>
                   <AgGridReact
+                      ref={fifoGridRef}
                       rowData={fifo}
                       columnDefs={columnDefsAccounting}
                       defaultColDef={defaultColDef}
-                  />
+                      />
               </div>
 
               <div style={{ width: '1000px', height: `calc(50px + (${lifo?.length} * 42px))`, marginTop: '60px', marginBottom: '100px' }}>
-                  <h1>LIFO</h1>
+                      <div style={{display: 'flex'}}>
+                         <h1>LIFO</h1>
+                        <button style={{ marginLeft: '896px' }} onClick={() => { lifoGridRef.current.api.exportDataAsCsv(); }}>Export</button>
+                      </div>
                   <AgGridReact
+                      ref={lifoGridRef}
                       rowData={lifo}
                       columnDefs={columnDefsAccounting}
                       defaultColDef={defaultColDef}

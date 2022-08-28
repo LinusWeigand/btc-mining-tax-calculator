@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import AddressForm from '../../components/AddressForm/AddressForm.js';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useRef } from 'react';
 
 //1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
 //1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
@@ -19,6 +20,7 @@ const Bitcoin = () => {
   const [btcPrice, setBtcPrice] = useState(
     JSON.parse(localStorage.getItem('btcPrice')) || null
   );
+  const gridRef = useRef();
 
   const columnDefs = [
     { headerName: 'Date', field: "date" },
@@ -114,6 +116,10 @@ const Bitcoin = () => {
     }
   }
 
+  const onButtonExport = () => {
+    gridRef.current.api.exportDataAsCsv();
+  }
+
   useEffect(() => {
     if (address !== "") {
       fetchData(address)
@@ -138,11 +144,13 @@ const Bitcoin = () => {
           <h2 style={{padding: '35px 0px 30px 10px'}}>
             {balance} BTC / {Math.round(balance * btcPrice * 100) / 100} €
             </h2>
+          <button onClick={onButtonExport} style={{margin: '35px 0px 30px 100px'}}>Export</button>
         </div>
         }
       </div>
       {rowData !== null &&
         <AgGridReact
+        ref={gridRef}
         rowData={rowData}
         columnDefs={columnDefs} 
         defaultColDef={defaultColDef}
