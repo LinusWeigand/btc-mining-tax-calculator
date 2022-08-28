@@ -136,13 +136,13 @@ const Bitcoin = () => {
     <div className='ag-theme-alpine-dark' style={{ height: `calc(50px + (${rowData?.length} * 42px))`, width: 'calc(100% - 250px)' }}>
       <div style={{display: 'flex'}} >
         <AddressForm handler={setAddress} className='addressform' />
-        {balance !== null &&
+        {rowData !== null &&
           <div style={{display: 'flex'}}>
           <h1 style={{ padding: '30px 0px 30px 30px' }}>
           Balance:
           </h1>
           <h2 style={{padding: '35px 0px 30px 10px'}}>
-            {balance} BTC / {Math.round(balance * btcPrice * 100) / 100} €
+            {balance ?? 0} BTC / {Math.round(balance * btcPrice * 100) / 100} €
             </h2>
           <button onClick={onButtonExport} style={{margin: '35px 0px 30px 100px'}}>Export</button>
         </div>
