@@ -39,7 +39,7 @@ const Bitcoin = () => {
       headerName: 'Fee in Euro', field: "feeInEuro",
       valueFormatter: (p) => `${Math.round(p.value * 100) / 100} €`
     },
-    { headerName: 'Txn Hash', field: "block_hash" },
+    { headerName: 'Txn Hash', field: "hash" },
   ];
 
   const defaultColDef = {
