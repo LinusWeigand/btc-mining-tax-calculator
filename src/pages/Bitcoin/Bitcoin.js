@@ -100,21 +100,7 @@ const Bitcoin = () => {
     localStorage.setItem('btcPrice', JSON.stringify(price));
   }
 
-  const satsToBtc = (sats) => {
-    return sats / Math.pow(10, 8);
-  };
-
-  const getBalance = async (address) => {
-    const result = await fetch(`https://blockchain.info/q/addressbalance/${address}`);
-    const result_json = await result.json();
-    if (result_json === null) {
-      setBalance(null);
-      localStorage.setItem('balance', JSON.stringify(null));
-    } else {
-      setBalance(satsToBtc(result_json));
-      localStorage.setItem('balance', JSON.stringify(satsToBtc(result_json)));
-    }
-  }
+ 
 
   const onButtonExport = () => {
     gridRef.current.api.exportDataAsCsv();
