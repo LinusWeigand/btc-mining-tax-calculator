@@ -6,8 +6,6 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useRef } from 'react';
 
-//1wiz18xYmhRX6xStj2b9t1rwWX4GKUgpv
-//1qAtZiyiJPrzfUQXiiVwvmMBm23tc5oaw
 
 const Bitcoin = () => {
   const [rowData, setRowData] = useState(
