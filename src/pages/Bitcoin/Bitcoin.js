@@ -7,7 +7,6 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useRef } from 'react';
 
 
-
 const Bitcoin = () => {
   const [rowData, setRowData] = useState(
     JSON.parse(localStorage.getItem('rowData')) || null
@@ -133,30 +132,30 @@ const Bitcoin = () => {
 
   return (
     <div className='ag-theme-alpine-dark' style={{ height: `calc(50px + (${rowData?.length} * 42px))`, width: 'calc(100% - 250px)' }}>
-      <div style={{display: 'flex'}} >
+      <div style={{ display: 'flex' }} >
         <AddressForm handler={setAddress} className='addressform' />
         {rowData !== null &&
-          <div style={{display: 'flex'}}>
-          <h1 style={{ padding: '30px 0px 30px 30px' }}>
-          Balance:
-          </h1>
-          <h2 style={{padding: '35px 0px 30px 10px'}}>
-            {balance ?? 0} BTC / {Math.round(balance * btcPrice * 100) / 100} €
+          <div style={{ display: 'flex' }}>
+            <h1 style={{ padding: '30px 0px 30px 30px' }}>
+              Balance:
+            </h1>
+            <h2 style={{ padding: '35px 0px 30px 10px' }}>
+              {balance ?? 0} BTC / {Math.round(balance * btcPrice * 100) / 100} €
             </h2>
-          <button onClick={onButtonExport} style={{margin: '35px 0px 30px 100px'}}>Export</button>
-        </div>
+            <button onClick={onButtonExport} style={{ margin: '35px 0px 30px 100px' }}>Export</button>
+          </div>
         }
       </div>
       {rowData !== null &&
         <AgGridReact
-        ref={gridRef}
-        rowData={rowData}
-        columnDefs={columnDefs} 
-        defaultColDef={defaultColDef}
+          ref={gridRef}
+          rowData={rowData}
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
         />
       }
-      
-      </div>
+
+    </div>
   );
 }
 
