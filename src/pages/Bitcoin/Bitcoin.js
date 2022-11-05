@@ -20,6 +20,7 @@ const Bitcoin = () => {
   );
   const gridRef = useRef();
 
+
   const columnDefs = [
     { headerName: 'Date', field: "date" },
     { headerName: 'Time', field: "time" },
